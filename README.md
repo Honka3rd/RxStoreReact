@@ -1,0 +1,2 @@
+# RxStoreReact
+RxStore React specification
