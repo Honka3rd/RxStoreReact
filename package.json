@@ -1,0 +1,33 @@
+{
+  "name": "rxstorereact",
+  "version": "1.0.0",
+  "description": "RxStore React specification",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "start": "node dist/index.js",
+    "build": "npx tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Honka3rd/RxStoreReact.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Honka3rd/RxStoreReact.git/issues"
+  },
+  "homepage": "https://github.com/Honka3rd/RxStoreReact.git#readme",
+  "keywords": [],
+  "author": "Zeli",
+  "license": "ISC",
+  "dependencies": {
+    "immutable": "^4.2.2",
+    "react": "^18.2.0",
+    "rx-store-core": "^2.1.9",
+    "rx-store-types": "^1.4.0",
+    "rxjs": "^7.8.0",
+    "typescript": "5.0.2"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.12"
+  }
+}
