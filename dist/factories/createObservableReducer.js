@@ -15,7 +15,7 @@ var createObservableReducer = function (store) {
                 reducer: reducerSingleton.current,
             });
         }, [key]);
-        var payload = useObservableState(key);
+        var payload = useObservableState(key)[0];
         return (0, react_1.useMemo)(function () { return [payload, dispatch]; }, [payload, dispatch]);
     };
 };

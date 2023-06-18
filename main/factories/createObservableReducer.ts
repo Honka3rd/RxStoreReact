@@ -22,7 +22,7 @@ export const createObservableReducer = <S extends BS>(
       });
     }, [key]);
 
-    const payload = useObservableState(key);
+    const [payload] = useObservableState(key);
 
     return useMemo(() => [payload, dispatch], [payload, dispatch]);
   };

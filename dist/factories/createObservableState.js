@@ -7,7 +7,11 @@ var createObservableState = function (store) {
     return function (key) {
         var _a = (0, react_1.useState)(getDefault(key)), state = _a[0], set = _a[1];
         (0, react_1.useEffect)(function () { return observe(key, set); }, []);
-        return state;
+        var mutator = (0, react_1.useCallback)(function (val) {
+            var _a;
+            store.setState((_a = {}, _a[key] = val, _a));
+        }, [key]);
+        return (0, react_1.useMemo)(function () { return [state, mutator]; }, [state, mutator]);
     };
 };
 exports.createObservableState = createObservableState;
