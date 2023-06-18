@@ -1,14 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { RxImStoreImpl, RxNStoreImpl } from "rx-store-core";
-import { AsyncStates, BS, Comparator } from "rx-store-types";
-import { AsyncSelectorStates, ComputationAsyncObservable } from "../interfaces";
+import { AsyncStates, BS, Comparator, ComputationAsync } from "rx-store-types";
+import { AsyncMetaStates } from "../interfaces";
 
 export const createObservableAsyncSelector = <S extends BS, R>(
   store: RxNStoreImpl<S> | RxImStoreImpl<S>
 ) => {
   const { withAsyncComputation } = store;
   return (
-    computation: ComputationAsyncObservable<R, S>,
+    computation: ComputationAsync<R, S>,
     defaultVal: R,
     comparator?: Comparator<{ [K in keyof S]: ReturnType<S[K]> }>
   ) => {
@@ -26,7 +26,7 @@ export const createObservableAsyncSelector = <S extends BS, R>(
         }),
       []
     );
-    const [state, set] = useState<AsyncSelectorStates<R>>({
+    const [state, set] = useState<AsyncMetaStates<R>>({
       state: computed.get().state,
       val: computed.get().value ?? defaultVal,
       err: null,

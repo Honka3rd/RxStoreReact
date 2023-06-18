@@ -1,10 +1,6 @@
-import { AsyncStates, BS } from "rx-store-types";
-import { Observable } from "rxjs";
-export type AsyncSelectorStates<R> = {
+import { AsyncStates } from "rx-store-types";
+export type AsyncMetaStates<R> = {
     state: AsyncStates;
     val: R;
     err: any;
 };
-export type ComputationAsyncObservable<R, S extends BS> = (states: {
-    [K in keyof S]: ReturnType<S[K]>;
-}) => Observable<R>;
