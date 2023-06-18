@@ -1,5 +1,5 @@
 {
-  "name": "rxstorereact",
+  "name": "rx-store-react",
   "version": "1.0.0",
   "description": "RxStore React specification",
   "main": "dist/index.js",
