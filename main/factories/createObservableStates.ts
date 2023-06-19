@@ -1,14 +1,32 @@
 import { RxImStoreImpl, RxNStoreImpl } from "rx-store-core";
 import { useEffect, useState } from "react";
-import { BS } from "rx-store-types";
+import { BS, IBS } from "rx-store-types";
 
-export const createObservableStates = <S extends BS, T extends (keyof S)[]>(
-  store: RxNStoreImpl<S> | RxImStoreImpl<S>
+export const createObservableStates = <S extends BS>(
+  store: RxNStoreImpl<S>
 ) => {
   const { observeMultiple, getDefaults } = store;
-  return (keys: T) => {
+  return <T extends (keyof S)[]>(keys: T) => {
     const [state, set] = useState(getDefaults(keys));
     useEffect(() => observeMultiple(keys, set), []);
+    return state;
+  };
+};
+
+export const createObservableImmutableStates = <S extends IBS>(
+  store: RxImStoreImpl<S>
+) => {
+  const { observeMultiple, getDefaults } = store;
+  return <T extends (keyof S)[]>(keys: T) => {
+    const [state, set] = useState(getDefaults(keys));
+    useEffect(
+      () =>
+        observeMultiple(keys, (data) => {
+          // @ts-ignore
+          set(data);
+        }),
+      []
+    );
     return state;
   };
 };
