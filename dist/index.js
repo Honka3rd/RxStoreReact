@@ -8,12 +8,12 @@ var createObservableReducer_1 = require("./factories/createObservableReducer");
 var createObservableAsyncSelector_1 = require("./factories/createObservableAsyncSelector");
 var createObservableAsyncReducer_1 = require("./factories/createObservableAsyncReducer");
 var stateObserverManager = function (store) { return ({
-    useObservableState: (0, createObservableState_1.createObservableState)(store),
+    useObservableState: (0, createObservableState_1.createObservableNormalState)(store),
     useObservableStates: (0, createObservableStates_1.createObservableStates)(store),
-    useObservableSelector: (0, createObservableSelector_1.createObservableSelector)(store),
-    useObservableReducer: (0, createObservableReducer_1.createObservableReducer)(store),
-    useObservableAsyncComputation: (0, createObservableAsyncSelector_1.createObservableAsyncSelector)(store),
-    useObservableAsyncReducer: (0, createObservableAsyncReducer_1.createObservableAsyncReducer)(store),
+    useObservableSelector: (0, createObservableSelector_1.createObservableNormalSelector)(store),
+    useObservableReducer: (0, createObservableReducer_1.createObservableNormalReducer)(store),
+    useObservableAsyncComputation: (0, createObservableAsyncSelector_1.createObservableAsyncNormalSelector)(store),
+    useObservableAsyncReducer: (0, createObservableAsyncReducer_1.createObservableAsyncNormalReducer)(store),
 }); };
 exports.stateObserverManager = stateObserverManager;
 var immutableStateObserverManager = function (store) { return ({

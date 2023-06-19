@@ -1,8 +1,7 @@
-import { RxNStoreImpl, RxImStoreImpl } from "rx-store-core";
-import { BS, IBS } from "rx-store-types";
+import { BS, IBS, RxImStore, RxNStore, Subscribable } from "rx-store-types";
 import {
   createObservableImmutableState,
-  createObservableState,
+  createObservableNormalState,
 } from "./factories/createObservableState";
 import {
   createObservableImmutableStates,
@@ -10,32 +9,34 @@ import {
 } from "./factories/createObservableStates";
 import {
   createObservableImmutableSelector,
-  createObservableSelector,
+  createObservableNormalSelector,
 } from "./factories/createObservableSelector";
 import {
   createObservableImmutableReducer,
-  createObservableReducer,
+  createObservableNormalReducer,
 } from "./factories/createObservableReducer";
 import {
   createObservableAsyncImmutableSelector,
-  createObservableAsyncSelector,
+  createObservableAsyncNormalSelector,
 } from "./factories/createObservableAsyncSelector";
 import {
   createObservableAsyncImmutableReducer,
-  createObservableAsyncReducer,
+  createObservableAsyncNormalReducer,
 } from "./factories/createObservableAsyncReducer";
 
-const stateObserverManager = <S extends BS>(store: RxNStoreImpl<S>) => ({
-  useObservableState: createObservableState(store),
+const stateObserverManager = <S extends BS>(
+  store: RxNStore<S> & Subscribable<S>
+) => ({
+  useObservableState: createObservableNormalState(store),
   useObservableStates: createObservableStates(store),
-  useObservableSelector: createObservableSelector(store),
-  useObservableReducer: createObservableReducer(store),
-  useObservableAsyncComputation: createObservableAsyncSelector(store),
-  useObservableAsyncReducer: createObservableAsyncReducer(store),
+  useObservableSelector: createObservableNormalSelector(store),
+  useObservableReducer: createObservableNormalReducer(store),
+  useObservableAsyncComputation: createObservableAsyncNormalSelector(store),
+  useObservableAsyncReducer: createObservableAsyncNormalReducer(store),
 });
 
 const immutableStateObserverManager = <S extends IBS>(
-  store: RxImStoreImpl<S>
+  store: RxImStore<S> & Subscribable<S>
 ) => ({
   useImmutableObservableState: createObservableImmutableState(store),
   useImmutableObservableStates: createObservableImmutableStates(store),

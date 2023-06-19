@@ -1,13 +1,18 @@
-import { useMemo, useRef } from "react";
-import { RxImStoreImpl, RxNStoreImpl } from "rx-store-core";
-import { BS, IBS, Reducer } from "rx-store-types";
-import { createObservableImmutableState, createObservableState } from "./createObservableState";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  BS,
+  IBS,
+  Reducer,
+  RxImStore,
+  RxNStore,
+  RxStore,
+  Subscribable,
+} from "rx-store-types";
 
 export const createObservableReducer = <S extends BS>(
-  store: RxNStoreImpl<S>
+  store: RxStore<S> & Subscribable<S>
 ) => {
-  const { createDispatch } = store;
-  const useObservableState = createObservableState(store);
+  const { createDispatch, getDefault, observe } = store;
   return <K extends keyof S, T extends string, P = void>(
     key: K,
     reducer: Reducer<T, P, S, K>
@@ -22,33 +27,21 @@ export const createObservableReducer = <S extends BS>(
       });
     }, [key]);
 
-    const [payload] = useObservableState(key);
+    const [payload, set] = useState(getDefault(key));
+    useEffect(() => observe(key, set), []);
 
     return useMemo(() => [payload, dispatch], [payload, dispatch]);
   };
 };
 
-export const createObservableImmutableReducer = <S extends IBS>(
-  store: RxImStoreImpl<S>
+export const createObservableNormalReducer = <S extends BS>(
+  store: RxNStore<S> & Subscribable<S>
 ) => {
-  const { createDispatch } = store;
-  const useObservableState = createObservableImmutableState(store);
-  return <K extends keyof S, T extends string, P = void>(
-    key: K,
-    reducer: Reducer<T, P, S, K>
-  ) => {
-    const reducerSingleton = useRef(reducer);
-    reducerSingleton.current = reducer;
+  return createObservableReducer(store);
+};
 
-    const dispatch = useMemo(() => {
-      return createDispatch({
-        key,
-        reducer: reducerSingleton.current,
-      });
-    }, [key]);
-
-    const [payload] = useObservableState(key);
-
-    return useMemo(() => [payload, dispatch], [payload, dispatch]);
-  };
+export const createObservableImmutableReducer = <S extends IBS>(
+  store: RxImStore<S> & Subscribable<S>
+) => {
+  return createObservableReducer(store);
 };

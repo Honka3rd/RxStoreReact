@@ -1,9 +1,8 @@
-import { RxNStoreImpl, RxImStoreImpl } from "rx-store-core";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { BS, IBS } from "rx-store-types";
+import { BS, IBS, RxStore, RxNStore, RxImStore, Subscribable } from "rx-store-types";
 
 export const createObservableState = <S extends BS>(
-  store: RxNStoreImpl<S>
+  store: RxStore<S> & Subscribable<S>
 ) => {
   const { observe, getDefault } = store;
   return <T extends keyof S>(key: T) => {
@@ -20,20 +19,14 @@ export const createObservableState = <S extends BS>(
   };
 };
 
-export const createObservableImmutableState = <S extends IBS>(
-  store: RxImStoreImpl<S>
+export const createObservableNormalState = <S extends BS>(
+  store: RxNStore<S> & Subscribable<S>
 ) => {
-  const { observe, getDefault } = store;
-  return <T extends keyof S>(key: T) => {
-    const [state, set] = useState<ReturnType<S[T]>>(getDefault(key));
-    useEffect(() => observe(key, set), []);
+  return createObservableState(store);
+};
 
-    const mutator = useCallback(
-      (val: ReturnType<S[T]>) => {
-        store.setState({ [key]: val } as {});
-      },
-      [key]
-    );
-    return useMemo(() => [state, mutator] as const, [state, mutator]);
-  };
+export const createObservableImmutableState = <S extends IBS>(
+  store: RxImStore<S> & Subscribable<S>
+) => {
+  return createObservableState(store);
 };

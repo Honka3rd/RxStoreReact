@@ -1,9 +1,14 @@
-import { RxImStoreImpl, RxNStoreImpl } from "rx-store-core";
 import { useEffect, useState } from "react";
-import { BS, IBS } from "rx-store-types";
+import {
+  BS,
+  IBS,
+  RxImStore,
+  RxNStore,
+  Subscribable,
+} from "rx-store-types";
 
 export const createObservableStates = <S extends BS>(
-  store: RxNStoreImpl<S>
+  store: RxNStore<S> & Subscribable<S>
 ) => {
   const { observeMultiple, getDefaults } = store;
   return <T extends (keyof S)[]>(keys: T) => {
@@ -14,7 +19,7 @@ export const createObservableStates = <S extends BS>(
 };
 
 export const createObservableImmutableStates = <S extends IBS>(
-  store: RxImStoreImpl<S>
+  store: RxImStore<S> & Subscribable<S>
 ) => {
   const { observeMultiple, getDefaults } = store;
   return <T extends (keyof S)[]>(keys: T) => {
