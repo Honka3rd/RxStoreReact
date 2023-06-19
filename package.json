@@ -1,6 +1,6 @@
 {
   "name": "rx-store-react",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "RxStore React specification",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -20,7 +20,6 @@
   "author": "Zeli",
   "license": "ISC",
   "dependencies": {
-    "immutable": "^4.2.2",
     "react": "^18.2.0",
     "rx-store-core": "^2.1.9",
     "rx-store-types": "^1.4.0",
