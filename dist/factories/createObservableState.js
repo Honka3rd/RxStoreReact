@@ -3,15 +3,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createObservableImmutableState = exports.createObservableNormalState = exports.createObservableState = void 0;
 var react_1 = require("react");
 var createObservableState = function (store) {
-    var observe = store.observe, getDefault = store.getDefault;
+    var observe = store.observe, getState = store.getState;
     return function (key) {
-        var _a = (0, react_1.useState)(getDefault(key)), state = _a[0], set = _a[1];
-        (0, react_1.useEffect)(function () { return observe(key, set); }, []);
+        var data = (0, react_1.useSyncExternalStore)(function (onchange) { return observe(key, onchange); }, function () { return getState(key); });
         var mutator = (0, react_1.useCallback)(function (val) {
             var _a;
             store.setState((_a = {}, _a[key] = val, _a));
         }, [key]);
-        return (0, react_1.useMemo)(function () { return [state, mutator]; }, [state, mutator]);
+        return (0, react_1.useMemo)(function () { return [data, mutator]; }, [data, mutator]);
     };
 };
 exports.createObservableState = createObservableState;

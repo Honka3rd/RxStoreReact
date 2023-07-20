@@ -1,13 +1,26 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { BS, IBS, RxStore, RxNStore, RxImStore, Subscribable } from "rx-store-types";
+import {
+  useCallback,
+  useMemo,
+  useSyncExternalStore,
+} from "react";
+import {
+  BS,
+  IBS,
+  RxStore,
+  RxNStore,
+  RxImStore,
+  Subscribable,
+} from "rx-store-types";
 
 export const createObservableState = <S extends BS>(
   store: RxStore<S> & Subscribable<S>
 ) => {
-  const { observe, getDefault } = store;
+  const { observe, getState } = store;
   return <T extends keyof S>(key: T) => {
-    const [state, set] = useState(getDefault(key));
-    useEffect(() => observe(key, set), []);
+    const data = useSyncExternalStore(
+      (onchange) => observe(key, onchange),
+      () => getState(key)
+    );
 
     const mutator = useCallback(
       (val: ReturnType<S[T]>) => {
@@ -15,7 +28,7 @@ export const createObservableState = <S extends BS>(
       },
       [key]
     );
-    return useMemo(() => [state, mutator] as const, [state, mutator]);
+    return useMemo(() => [data, mutator] as const, [data, mutator]);
   };
 };
 
