@@ -26,7 +26,7 @@ var createObservableAsyncReducer = function (store) {
         }, [key]);
         var _a = (0, react_1.useState)({
             value: store.getState(key),
-            state: rx_store_types_1.AsyncStates.PENDING,
+            state: rx_store_types_1.AsyncStates.FULFILLED,
             error: null,
         }), state = _a[0], set = _a[1];
         var dispatch = (0, react_1.useCallback)(function (action) {

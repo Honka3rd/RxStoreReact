@@ -4,7 +4,7 @@ A state management library based on [rx-store-core](https://www.npmjs.com/packag
 
 ## Install
 
-npm install rx-store-react
+npm install rx-store-core rx-store-react
 
 ## Use a normal state manager
 
@@ -176,7 +176,7 @@ const { state, value, error } = useObservableAsyncComputation(({ count, checked 
 })
 
 ```
-[example](https://codesandbox.io/p/sandbox/cool-haibt-d55kx4)
+[example](https://codesandbox.io/p/sandbox/rx-store-react-useasynccomputed-d55kx4?file=%2Fsrc%2FApp.tsx%3A42%2C34)
 
 ### useObservableAsyncReducer
 
@@ -202,4 +202,37 @@ Return: an constant array
 ```
 R stands for reduced result, T stands for different action type, payload stands for optional R
 
-[example]()
+[example](https://codesandbox.io/p/sandbox/rx-store-react-useasynccomputed-d55kx4?file=%2Fsrc%2FApp.tsx%3A1%2C1)
+
+## Use a Immutable state manager
+
+**Import**
+
+```javascript
+import { IRS } from "rx-store-core";
+import { immutableStateObserverManager } from "rx-store-react";
+```
+
+**Usage**
+Useful when you frequently compare and clone complex data structure
+Use of IRS API is the almost the same as NRS
+Make sure you are familiar with [Immutable data structure](https://immutable-js.com/docs/v4.3.0)
+```javascript
+import { Map } from "immutable";
+const immutableStore = IRS({
+    info: () => Map({
+        checked: false,
+        count: 0
+    })
+});
+
+const { 
+    useImmutableObservableState,
+    useImmutableObservableStates,
+    useImmutableObservableSelector,
+    useImmutableObservableReducer,
+    useImmutableObservableAsyncComputation,
+    useImmutableObservableAsyncReducer
+} = immutableStateObserverManager(immutableStore)
+```
+[try it here](https://codesandbox.io/p/sandbox/rx-store-react-immutable-lmrjrv)

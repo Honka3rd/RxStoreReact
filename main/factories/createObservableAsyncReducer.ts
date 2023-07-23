@@ -31,7 +31,7 @@ export const createObservableAsyncReducer = <S extends BS>(
 
     const [state, set] = useState<AsyncMetaStates<ReturnType<S[K]>>>({
       value: store.getState(key),
-      state: AsyncStates.PENDING,
+      state: AsyncStates.FULFILLED,
       error: null,
     });
 
