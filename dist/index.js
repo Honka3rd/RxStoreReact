@@ -9,7 +9,7 @@ var createObservableAsyncSelector_1 = require("./factories/createObservableAsync
 var createObservableAsyncReducer_1 = require("./factories/createObservableAsyncReducer");
 var stateObserverManager = function (store) { return ({
     useObservableState: (0, createObservableState_1.createObservableNormalState)(store),
-    useObservableStates: (0, createObservableStates_1.createObservableStates)(store),
+    useObservableStates: (0, createObservableStates_1.createObservableNormalStates)(store),
     useObservableSelector: (0, createObservableSelector_1.createObservableNormalSelector)(store),
     useObservableReducer: (0, createObservableReducer_1.createObservableNormalReducer)(store),
     useObservableAsyncComputation: (0, createObservableAsyncSelector_1.createObservableAsyncNormalSelector)(store),

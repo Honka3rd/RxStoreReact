@@ -1,4 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  useMemo,
+  useRef,
+  useSyncExternalStore,
+} from "react";
 import {
   AsyncStates,
   BS,
@@ -17,57 +21,47 @@ export const createObservableAsyncSelector = <S extends BS>(
   const { withAsyncComputation } = store;
   return <R>(
     computation: ComputationAsync<R, S>,
-    defaultVal: R,
+    fallback: R,
     comparator?: Comparator<{ [K in keyof S]: ReturnType<S[K]> }>
   ) => {
-    const computationRef = useRef(computation);
-    const comparatorRef = useRef(comparator);
-
-    computationRef.current = computation;
-    comparatorRef.current = comparator;
+    const computationSingleton = useRef(computation);
+    const comparatorSingleton = useRef(comparator);
 
     const computed = useMemo(
       () =>
         withAsyncComputation({
-          computation: computationRef.current,
-          comparator: comparatorRef.current,
+          computation: computationSingleton.current,
+          comparator: comparatorSingleton.current,
         }),
       []
     );
-    const [state, set] = useState<AsyncMetaStates<R>>({
-      state: computed.get().state,
-      val: computed.get().value ?? defaultVal,
-      err: null,
-    });
 
-    useEffect(
-      () =>
-        computed.observe(
-          (r) => {
-            if (r.success) {
-              set({
-                state: AsyncStates.FULFILLED,
-                val: r.result,
-                err: null,
-              });
-              return;
-            }
-            set({
-              state: AsyncStates.ERROR,
-              val: computed.get().value ?? defaultVal,
-              err: r.cause,
-            });
-          },
-          () => {
-            set({
-              state: AsyncStates.PENDING,
-              val: computed.get().value ?? defaultVal,
-              err: null,
-            });
-          }
-        ),
-      [defaultVal]
+    const data = useSyncExternalStore(
+      (onchange) => computed.observe(onchange),
+      () => computed.get()
     );
+
+    const state = useMemo<AsyncMetaStates<R>>(() => {
+      switch (data.state) {
+        case AsyncStates.FULFILLED:
+          return {
+            state: AsyncStates.FULFILLED,
+            value: data.value!,
+            success: true
+          };
+        case AsyncStates.ERROR:
+          return {
+            state: AsyncStates.ERROR,
+            value: fallback,
+            success: false
+          };
+        default:
+          return {
+            state: AsyncStates.PENDING,
+            value: data.value!,
+          };
+      }
+    }, [fallback, data]);
 
     return state;
   };

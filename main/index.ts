@@ -5,7 +5,7 @@ import {
 } from "./factories/createObservableState";
 import {
   createObservableImmutableStates,
-  createObservableStates,
+  createObservableNormalStates,
 } from "./factories/createObservableStates";
 import {
   createObservableImmutableSelector,
@@ -28,7 +28,7 @@ const stateObserverManager = <S extends BS>(
   store: RxNStore<S> & Subscribable<S>
 ) => ({
   useObservableState: createObservableNormalState(store),
-  useObservableStates: createObservableStates(store),
+  useObservableStates: createObservableNormalStates(store),
   useObservableSelector: createObservableNormalSelector(store),
   useObservableReducer: createObservableNormalReducer(store),
   useObservableAsyncComputation: createObservableAsyncNormalSelector(store),

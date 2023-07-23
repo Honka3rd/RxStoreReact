@@ -16,9 +16,8 @@ var react_1 = require("react");
 var rx_store_types_1 = require("rx-store-types");
 var createObservableAsyncReducer = function (store) {
     var createAsyncDispatch = store.createAsyncDispatch;
-    return function (key, reducer) {
+    return function (key, reducer, fallback) {
         var reducerSingleton = (0, react_1.useRef)(reducer);
-        reducerSingleton.current = reducer;
         var dispatchAsync = (0, react_1.useMemo)(function () {
             return createAsyncDispatch({
                 key: key,
@@ -26,24 +25,30 @@ var createObservableAsyncReducer = function (store) {
             });
         }, [key]);
         var _a = (0, react_1.useState)({
-            val: store.getDefault(key),
+            value: store.getState(key),
             state: rx_store_types_1.AsyncStates.PENDING,
-            err: null,
+            error: null,
         }), state = _a[0], set = _a[1];
         var dispatch = (0, react_1.useCallback)(function (action) {
             dispatchAsync(action, {
                 start: function () {
                     set(function (prev) { return (__assign(__assign({}, prev), { state: rx_store_types_1.AsyncStates.PENDING, err: null })); });
                 },
-                fail: function (err) {
-                    set(function (prev) { return (__assign(__assign({}, prev), { state: rx_store_types_1.AsyncStates.ERROR, err: err })); });
+                fail: function (error) {
+                    set({
+                        state: rx_store_types_1.AsyncStates.ERROR,
+                        success: false,
+                        error: error,
+                        value: fallback === undefined ? store.getDefault(key) : fallback,
+                    });
                 },
                 success: function (r) {
-                    set(function () { return ({
+                    set({
                         state: rx_store_types_1.AsyncStates.FULFILLED,
-                        err: null,
-                        val: r,
-                    }); });
+                        success: true,
+                        error: null,
+                        value: r,
+                    });
                 },
             });
         }, [dispatchAsync]);

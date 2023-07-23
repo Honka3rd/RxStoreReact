@@ -1,6 +1,6 @@
 {
   "name": "rx-store-react",
-  "version": "1.0.9",
+  "version": "1.1.0",
   "description": "RxStore React specification",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -21,7 +21,7 @@
   "license": "ISC",
   "dependencies": {
     "react": "^18.2.0",
-    "rx-store-types": "^1.4.1",
+    "rx-store-types": "^1.4.5",
     "typescript": "5.0.2"
   },
   "devDependencies": {

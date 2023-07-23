@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useSyncExternalStore } from "react";
 import {
   BS,
   Computation,
@@ -13,14 +13,15 @@ export const createObservableSelector = <S extends BS>(store: RxStore<S>) => {
 
   return <R>(computation: Computation<R, S>) => {
     const computationRef = useRef(computation);
-    computationRef.current = computation;
     const computed = useMemo(
       () => withComputation({ computation: computationRef.current }),
       []
     );
-    const [state, set] = useState(computed.get());
-    useEffect(() => computed.observe(set), []);
-    return state;
+    const data = useSyncExternalStore(
+      (onchange) => computed.observe(onchange),
+      () => computed.get()!
+    );
+    return data;
   };
 };
 

@@ -1,37 +1,28 @@
-import { useEffect, useState } from "react";
-import {
-  BS,
-  IBS,
-  RxImStore,
-  RxNStore,
-  Subscribable,
-} from "rx-store-types";
+import { useSyncExternalStore } from "react";
+import { BS, IBS, RxImStore, RxNStore, Subscribable } from "rx-store-types";
 
-export const createObservableStates = <S extends BS>(
+export const createObservableNormalStates = <S extends BS>(
   store: RxNStore<S> & Subscribable<S>
 ) => {
-  const { observeMultiple, getDefaults } = store;
+  const { observeMultiple, getStates } = store;
   return <T extends (keyof S)[]>(keys: T) => {
-    const [state, set] = useState(getDefaults(keys));
-    useEffect(() => observeMultiple(keys, set), []);
-    return state;
+    const data = useSyncExternalStore(
+      (onchange) => observeMultiple(keys, onchange),
+      () => getStates(keys)
+    );
+    return data;
   };
 };
 
 export const createObservableImmutableStates = <S extends IBS>(
   store: RxImStore<S> & Subscribable<S>
 ) => {
-  const { observeMultiple, getDefaults } = store;
+  const { observeMultiple, getStates } = store;
   return <T extends (keyof S)[]>(keys: T) => {
-    const [state, set] = useState(getDefaults(keys));
-    useEffect(
-      () =>
-        observeMultiple(keys, (data) => {
-          // @ts-ignore
-          set(data);
-        }),
-      []
+    const data = useSyncExternalStore(
+      (onchange) => observeMultiple(keys, onchange),
+      () => getStates(keys)
     );
-    return state;
+    return data;
   };
 };

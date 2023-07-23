@@ -1,4 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import {
   BS,
   IBS,
@@ -12,13 +18,12 @@ import {
 export const createObservableReducer = <S extends BS>(
   store: RxStore<S> & Subscribable<S>
 ) => {
-  const { createDispatch, getDefault, observe } = store;
-  return <K extends keyof S, T extends string, P = void>(
+  const { createDispatch, getState, observe } = store;
+  return <K extends keyof S, T extends string>(
     key: K,
-    reducer: Reducer<T, P, S, K>
+    reducer: Reducer<T, S, K>
   ) => {
     const reducerSingleton = useRef(reducer);
-    reducerSingleton.current = reducer;
 
     const dispatch = useMemo(() => {
       return createDispatch({
@@ -27,10 +32,12 @@ export const createObservableReducer = <S extends BS>(
       });
     }, [key]);
 
-    const [payload, set] = useState(getDefault(key));
-    useEffect(() => observe(key, set), []);
+    const payload = useSyncExternalStore(
+      (onchange) => observe(key, onchange),
+      () => getState(key)
+    );
 
-    return useMemo(() => [payload, dispatch], [payload, dispatch]);
+    return useMemo(() => [payload, dispatch] as const, [payload, dispatch]);
   };
 };
 

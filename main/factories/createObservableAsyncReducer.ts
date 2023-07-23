@@ -15,12 +15,12 @@ export const createObservableAsyncReducer = <S extends BS>(
   store: RxStore<S>
 ) => {
   const { createAsyncDispatch } = store;
-  return <K extends keyof S, T extends string, P = void>(
+  return <K extends keyof S, T extends string>(
     key: K,
-    reducer: AsyncReducer<T, P, S, K>
+    reducer: AsyncReducer<T, S, K>,
+    fallback?: ReturnType<S[K]>
   ) => {
     const reducerSingleton = useRef(reducer);
-    reducerSingleton.current = reducer;
 
     const dispatchAsync = useMemo(() => {
       return createAsyncDispatch({
@@ -30,33 +30,39 @@ export const createObservableAsyncReducer = <S extends BS>(
     }, [key]);
 
     const [state, set] = useState<AsyncMetaStates<ReturnType<S[K]>>>({
-      val: store.getDefault(key),
+      value: store.getState(key),
       state: AsyncStates.PENDING,
-      err: null,
+      error: null,
     });
 
     const dispatch = useCallback(
-      (action: Action<P, T>) => {
+      (action: Action<ReturnType<S[K]>, T>) => {
         dispatchAsync(action, {
           start: () => {
             set((prev) => ({ ...prev, state: AsyncStates.PENDING, err: null }));
           },
-          fail: (err) => {
-            set((prev) => ({ ...prev, state: AsyncStates.ERROR, err }));
+          fail: (error) => {
+            set({
+              state: AsyncStates.ERROR,
+              success: false,
+              error,
+              value: fallback === undefined ? store.getDefault(key) : fallback,
+            });
           },
           success: (r) => {
-            set(() => ({
+            set({
               state: AsyncStates.FULFILLED,
-              err: null,
-              val: r,
-            }));
+              success: true,
+              error: null,
+              value: r,
+            });
           },
         });
       },
       [dispatchAsync]
     );
 
-    return useMemo(() => [state, dispatch], [state, dispatch]);
+    return useMemo(() => [state, dispatch] as const, [state, dispatch]);
   };
 };
 
