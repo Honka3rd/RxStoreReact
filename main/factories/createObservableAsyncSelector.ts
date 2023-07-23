@@ -1,4 +1,9 @@
-import { useMemo, useRef, useSyncExternalStore } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   AsyncGet,
   AsyncStates,
@@ -12,21 +17,6 @@ import {
   RxStore,
 } from "rx-store-types";
 import { AsyncMetaStates } from "../interfaces";
-
-const cachedGet = <R, S extends BS>(computed: ComputedAsync<R, S>) => {
-  let previous: AsyncGet<R>;
-  return () => {
-    const current = computed.get();
-    if (
-      current.state === previous?.state &&
-      current.value === previous?.value
-    ) {
-      return previous;
-    }
-    previous = current;
-    return current;
-  };
-};
 
 export const createObservableAsyncSelector = <S extends BS>(
   store: RxStore<S>
@@ -49,32 +39,41 @@ export const createObservableAsyncSelector = <S extends BS>(
       []
     );
 
-    const data = useSyncExternalStore(
-      (onchange) => computed.observe(onchange, onchange),
-      cachedGet(computed)
-    );
+    const [state, set] = useState<AsyncMetaStates<R>>({
+      state: AsyncStates.FULFILLED,
+      value: fallback,
+      error: null,
+    });
 
-    const state = useMemo<AsyncMetaStates<R>>(() => {
-      switch (data.state) {
-        case AsyncStates.FULFILLED:
-          return {
-            state: AsyncStates.FULFILLED,
-            value: data.value!,
-            success: true,
-          };
-        case AsyncStates.ERROR:
-          return {
-            state: AsyncStates.ERROR,
-            value: fallback,
-            success: false,
-          };
-        default:
-          return {
-            state: AsyncStates.PENDING,
-            value: data.value!,
-          };
-      }
-    }, [fallback, data]);
+    useEffect(
+      () =>
+        computed.observe(
+          (r) => {
+            if (r.success) {
+              set({
+                state: AsyncStates.FULFILLED,
+                value: r.result,
+                error: null,
+              });
+              return;
+            }
+            set({
+              state: AsyncStates.ERROR,
+              value: fallback,
+              error: r.cause,
+            });
+          },
+          () => {
+            const value = computed.get().value;
+            set({
+              state: AsyncStates.PENDING,
+              value: value === undefined ? fallback : value,
+              error: null,
+            });
+          }
+        ),
+      [fallback]
+    );
 
     return state;
   };

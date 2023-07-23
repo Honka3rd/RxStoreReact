@@ -3,18 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createObservableAsyncImmutableSelector = exports.createObservableAsyncNormalSelector = exports.createObservableAsyncSelector = void 0;
 var react_1 = require("react");
 var rx_store_types_1 = require("rx-store-types");
-var cachedGet = function (computed) {
-    var previous;
-    return function () {
-        var current = computed.get();
-        if (current.state === (previous === null || previous === void 0 ? void 0 : previous.state) &&
-            current.value === (previous === null || previous === void 0 ? void 0 : previous.value)) {
-            return previous;
-        }
-        previous = current;
-        return current;
-    };
-};
 var createObservableAsyncSelector = function (store) {
     var withAsyncComputation = store.withAsyncComputation;
     return function (computation, fallback, comparator) {
@@ -26,28 +14,35 @@ var createObservableAsyncSelector = function (store) {
                 comparator: comparatorSingleton.current,
             });
         }, []);
-        var data = (0, react_1.useSyncExternalStore)(function (onchange) { return computed.observe(onchange, onchange); }, cachedGet(computed));
-        var state = (0, react_1.useMemo)(function () {
-            switch (data.state) {
-                case rx_store_types_1.AsyncStates.FULFILLED:
-                    return {
+        var _a = (0, react_1.useState)({
+            state: rx_store_types_1.AsyncStates.FULFILLED,
+            value: fallback,
+            error: null,
+        }), state = _a[0], set = _a[1];
+        (0, react_1.useEffect)(function () {
+            return computed.observe(function (r) {
+                if (r.success) {
+                    set({
                         state: rx_store_types_1.AsyncStates.FULFILLED,
-                        value: data.value,
-                        success: true,
-                    };
-                case rx_store_types_1.AsyncStates.ERROR:
-                    return {
-                        state: rx_store_types_1.AsyncStates.ERROR,
-                        value: fallback,
-                        success: false,
-                    };
-                default:
-                    return {
-                        state: rx_store_types_1.AsyncStates.PENDING,
-                        value: data.value,
-                    };
-            }
-        }, [fallback, data]);
+                        value: r.result,
+                        error: null,
+                    });
+                    return;
+                }
+                set({
+                    state: rx_store_types_1.AsyncStates.ERROR,
+                    value: fallback,
+                    error: r.cause,
+                });
+            }, function () {
+                var value = computed.get().value;
+                set({
+                    state: rx_store_types_1.AsyncStates.PENDING,
+                    value: value === undefined ? fallback : value,
+                    error: null,
+                });
+            });
+        }, [fallback]);
         return state;
     };
 };
