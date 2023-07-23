@@ -14,7 +14,7 @@ var createObservableAsyncSelector = function (store) {
                 comparator: comparatorSingleton.current,
             });
         }, []);
-        var data = (0, react_1.useSyncExternalStore)(function (onchange) { return computed.observe(onchange); }, function () { return computed.get(); });
+        var data = (0, react_1.useSyncExternalStore)(function (onchange) { return computed.observe(onchange, onchange); }, function () { return computed.get(); });
         var state = (0, react_1.useMemo)(function () {
             switch (data.state) {
                 case rx_store_types_1.AsyncStates.FULFILLED:

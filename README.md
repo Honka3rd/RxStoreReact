@@ -39,7 +39,7 @@ const {
   resetAll
 } = store;
 ```
-As for how to use these functions, please refer to [this doc](https://www.npmjs.com/package/rx-store-core)
+As for how to use these functions, please refer to [this doc](https://github.com/Honka3rd/RxStore#readme)
 
 React state observer hooks definitions:
 ```javascript
@@ -100,7 +100,7 @@ const computed: `${number} is ${boolean}` = useObservableSelector(({ count, chec
 Desc: a global state control similar to React useReducer, for complex state handling
 
 Params: key of NRS definition, a reducer(*) function
-*reducer: Reducer<T, P, S, K> is a function takes previous value as argument and return T, T is dispatch type extends string, P is a optional payload, S is all state keys, K is the observed key
+*reducer: Reducer<T, S, K> is a function takes previous value as argument and return T, T is dispatch type extends string, S is all state keys, K is the observed key
 
 Return: a constant array, [value, dispatch], value is the returned payload by reducer, dispatch(*) is a function to trigger reducer invocation, and change the state defined inside NRS
 *dispatch: a function take
@@ -110,7 +110,7 @@ Return: a constant array, [value, dispatch], value is the returned payload by re
 as argument, return void
 
 ```javascript
-const [value, dispatch] = useObservableReducer<"count", "plus" | "minus" | "replace", number>("count", (previous, { type, payload }) => {
+const [value, dispatch] = useObservableReducer<"count", "plus" | "minus" | "replace">("count", (previous, { type, payload }) => {
     if(type === "plus") {
         return previous + 1;
     }
@@ -176,7 +176,7 @@ const { state, value, error } = useObservableAsyncComputation(({ count, checked 
 })
 
 ```
-[example]()
+[example](https://codesandbox.io/p/sandbox/cool-haibt-d55kx4)
 
 ### useObservableAsyncReducer
 

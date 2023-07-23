@@ -37,7 +37,7 @@ export const createObservableAsyncSelector = <S extends BS>(
     );
 
     const data = useSyncExternalStore(
-      (onchange) => computed.observe(onchange),
+      (onchange) => computed.observe(onchange, onchange),
       () => computed.get()
     );
 
