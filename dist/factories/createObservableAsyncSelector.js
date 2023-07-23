@@ -3,6 +3,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createObservableAsyncImmutableSelector = exports.createObservableAsyncNormalSelector = exports.createObservableAsyncSelector = void 0;
 var react_1 = require("react");
 var rx_store_types_1 = require("rx-store-types");
+var cachedGet = function (computed) {
+    var previous;
+    return function () {
+        var current = computed.get();
+        if (current.state === (previous === null || previous === void 0 ? void 0 : previous.state) &&
+            current.value === (previous === null || previous === void 0 ? void 0 : previous.value)) {
+            return previous;
+        }
+        previous = current;
+        return current;
+    };
+};
 var createObservableAsyncSelector = function (store) {
     var withAsyncComputation = store.withAsyncComputation;
     return function (computation, fallback, comparator) {
@@ -14,20 +26,20 @@ var createObservableAsyncSelector = function (store) {
                 comparator: comparatorSingleton.current,
             });
         }, []);
-        var data = (0, react_1.useSyncExternalStore)(function (onchange) { return computed.observe(onchange, onchange); }, function () { return computed.get(); });
+        var data = (0, react_1.useSyncExternalStore)(function (onchange) { return computed.observe(onchange, onchange); }, cachedGet(computed));
         var state = (0, react_1.useMemo)(function () {
             switch (data.state) {
                 case rx_store_types_1.AsyncStates.FULFILLED:
                     return {
                         state: rx_store_types_1.AsyncStates.FULFILLED,
                         value: data.value,
-                        success: true
+                        success: true,
                     };
                 case rx_store_types_1.AsyncStates.ERROR:
                     return {
                         state: rx_store_types_1.AsyncStates.ERROR,
                         value: fallback,
-                        success: false
+                        success: false,
                     };
                 default:
                     return {
