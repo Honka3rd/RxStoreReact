@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   AsyncReducer,
   BS,
@@ -22,45 +22,42 @@ export const createObservableAsyncReducer = <S extends BS>(
   ) => {
     const reducerSingleton = useRef(reducer);
 
-    const dispatchAsync = useMemo(() => {
-      return createAsyncDispatch({
-        key,
-        reducer: reducerSingleton.current,
-      });
-    }, [key]);
-
     const [state, set] = useState<AsyncMetaStates<ReturnType<S[K]>>>({
       value: store.getState(key),
       state: AsyncStates.FULFILLED,
       error: null,
     });
 
-    const dispatch = useCallback(
-      (action: Action<ReturnType<S[K]>, T>) => {
-        dispatchAsync(action, {
+    const [dispatch, reduce] = useMemo(() => {
+      return createAsyncDispatch({
+        key,
+        reducer: reducerSingleton.current,
+        config: {
           start: () => {
             set((prev) => ({ ...prev, state: AsyncStates.PENDING, err: null }));
           },
-          fail: (error) => {
+          fail: (error, value) => {
             set({
               state: AsyncStates.ERROR,
               success: false,
               error,
-              value: fallback === undefined ? store.getDefault(key) : fallback,
+              value,
             });
           },
-          success: (r) => {
+          success: (value) => {
             set({
               state: AsyncStates.FULFILLED,
               success: true,
               error: null,
-              value: r,
+              value,
             });
           },
-        });
-      },
-      [dispatchAsync]
-    );
+          fallback,
+        },
+      });
+    }, [key]);
+
+    useEffect(reduce, []);
 
     return useMemo(() => [state, dispatch] as const, [state, dispatch]);
   };
