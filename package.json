@@ -1,6 +1,6 @@
 {
   "name": "rx-store-react",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "RxStore React specification",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -16,7 +16,13 @@
     "url": "https://github.com/Honka3rd/RxStoreReact.git/issues"
   },
   "homepage": "https://github.com/Honka3rd/RxStoreReact.git#readme",
-  "keywords": [],
+  "keywords": [
+    "React",
+    "State Management",
+    "Rxjs",
+    "Typescript",
+    "Immutable"
+  ],
   "author": "Zeli",
   "license": "ISC",
   "dependencies": {
