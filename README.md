@@ -202,7 +202,7 @@ Return: an constant array
 ```
 R stands for reduced result, T stands for different action type, payload stands for optional R
 
-[example](https://codesandbox.io/p/sandbox/rx-store-react-useobservablereducer-k243sz)
+[example](https://codesandbox.io/p/sandbox/rx-store-react-useasyncobservablereducer-dphkn4)
 
 ## Use a Immutable state manager
 
