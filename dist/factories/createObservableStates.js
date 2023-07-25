@@ -7,10 +7,11 @@ exports.createObservableImmutableStates = exports.createObservableNormalStates =
 var immutable_1 = __importDefault(require("immutable"));
 var react_1 = require("react");
 var createObservableNormalStates = function (store) {
-    var observeMultiple = store.observeMultiple, getStates = store.getStates;
+    var observeMultiple = store.observeMultiple, getDefaults = store.getDefaults;
     return function (keys) {
-        var data = (0, react_1.useSyncExternalStore)(function (onchange) { return observeMultiple(keys, onchange); }, function () { return getStates(keys); });
-        return data;
+        var _a = (0, react_1.useState)(getDefaults(keys)), state = _a[0], set = _a[1];
+        (0, react_1.useEffect)(function () { return observeMultiple(keys, set); }, []);
+        return state;
     };
 };
 exports.createObservableNormalStates = createObservableNormalStates;

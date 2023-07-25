@@ -4,20 +4,17 @@ import {
   useEffect,
   useRef,
   useState,
-  useSyncExternalStore,
 } from "react";
 import { BS, IBS, RxImStore, RxNStore, Subscribable } from "rx-store-types";
 
 export const createObservableNormalStates = <S extends BS>(
   store: RxNStore<S> & Subscribable<S>
 ) => {
-  const { observeMultiple, getStates } = store;
+  const { observeMultiple, getDefaults } = store;
   return <T extends (keyof S)[]>(keys: T) => {
-    const data = useSyncExternalStore(
-      (onchange) => observeMultiple(keys, onchange),
-      () => getStates(keys)
-    );
-    return data;
+    const [state, set] = useState(getDefaults(keys));
+    useEffect(() => observeMultiple(keys, set), []);
+    return state;
   };
 };
 
