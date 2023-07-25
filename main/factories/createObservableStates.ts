@@ -1,10 +1,5 @@
 import Immutable from "immutable";
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { BS, IBS, RxImStore, RxNStore, Subscribable } from "rx-store-types";
 
 export const createObservableNormalStates = <S extends BS>(
@@ -35,15 +30,21 @@ export const createObservableImmutableStates = <S extends IBS>(
 
   return <T extends (keyof S)[]>(keys: T) => {
     const keysRef = useRef(keys);
-    const factory = useCallback(
-      recordFactory(keysRef.current),
-      []
-    );
+    const previousRef = useRef<
+      Immutable.Record<Converted<T>> & Readonly<Converted<T>>
+    >();
+    const factory = useCallback(recordFactory(keysRef.current), []);
     const [state, set] = useState(factory());
     useEffect(
       () =>
         observeMultiple<T[number]>(keys, (data) => {
-          set(factory(data));
+          const converted = factory(data);
+          const previous = previousRef.current;
+          if (previous && previous.equals(converted)) {
+            return;
+          }
+          set(converted);
+          previousRef.current = converted;
         }),
       []
     );

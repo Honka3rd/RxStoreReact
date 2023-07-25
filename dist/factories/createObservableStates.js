@@ -22,11 +22,18 @@ var createObservableImmutableStates = function (store) {
     };
     return function (keys) {
         var keysRef = (0, react_1.useRef)(keys);
+        var previousRef = (0, react_1.useRef)();
         var factory = (0, react_1.useCallback)(recordFactory(keysRef.current), []);
         var _a = (0, react_1.useState)(factory()), state = _a[0], set = _a[1];
         (0, react_1.useEffect)(function () {
             return observeMultiple(keys, function (data) {
-                set(factory(data));
+                var converted = factory(data);
+                var previous = previousRef.current;
+                if (previous && previous.equals(converted)) {
+                    return;
+                }
+                set(converted);
+                previousRef.current = converted;
             });
         }, []);
         return state;
