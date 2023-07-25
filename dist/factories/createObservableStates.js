@@ -16,18 +16,16 @@ var createObservableNormalStates = function (store) {
 exports.createObservableNormalStates = createObservableNormalStates;
 var createObservableImmutableStates = function (store) {
     var observeMultiple = store.observeMultiple, getDefaults = store.getDefaults;
-    var recordDefaultFactory = function (keys) {
+    var recordFactory = function (keys) {
         return immutable_1.default.Record(getDefaults(keys).toObject());
     };
-    var recordFactory = function (states) {
-        return immutable_1.default.Record(states);
-    };
     return function (keys) {
-        var factoryDefault = (0, react_1.useCallback)(function () { return recordDefaultFactory(keys); }, []);
-        var _a = (0, react_1.useState)(factoryDefault()), state = _a[0], set = _a[1];
+        var keysRef = (0, react_1.useRef)(keys);
+        var factory = (0, react_1.useCallback)(recordFactory(keysRef.current), []);
+        var _a = (0, react_1.useState)(factory()), state = _a[0], set = _a[1];
         (0, react_1.useEffect)(function () {
             return observeMultiple(keys, function (data) {
-                set(recordFactory(data));
+                set(factory(data));
             });
         }, []);
         return state;
