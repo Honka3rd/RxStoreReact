@@ -90,7 +90,7 @@ Desc: get a computed state, based on all inner state defined inside NRS, when de
 
 Params: computation function which takes all defined states as an argument and return a computed value
 
-Return: a computed value identical with the input computation function
+Return: a computed value identical with the input computation function return value
 
 ```javascript
 const computed: `${number} is ${boolean}` = useObservableSelector(({ count, checked }) => {
@@ -227,12 +227,13 @@ Use of IRS API is the almost the same as use of NRS
 Make sure you are familiar with [Immutable data structure](https://immutable-js.com/docs/v4.3.0)
 ```javascript
 import { Map } from "immutable";
-const immutableStore = IRS({
+const initiator = {
     info: () => Map({
         checked: false,
         count: 0
     })
-});
+}
+const immutableStore = IRS(initiator);
 
 const { 
     useImmutableObservableState,
@@ -244,3 +245,5 @@ const {
 } = immutableStateObserverManager(immutableStore)
 ```
 [try it here](https://codesandbox.io/p/sandbox/rx-store-react-immutable-lmrjrv)
+
+* the return type of useImmutableObservableStates is not a plain JavaScript object, instead, it is a Immutable.RecordOf({[selected key: related value]})
