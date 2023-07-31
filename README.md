@@ -58,7 +58,8 @@ const {
 Desc: observe one state in NRS by key
 
 Params: key that is defined in NRS, ie: count and checked
-Return: [return type of related state constructor, state mutator]
+
+Return: [state, state mutator]
 
 ```javascript
 const [count, setCount] = useObservableState("count");
@@ -74,6 +75,7 @@ const [count, setCount] = useObservableState("count");
 Desc: Observe multiple state in NRS by keys
 
 Params: Array of keys defined in NRS, duplication not allowed
+
 Return: an object contains defined keys and related values
 
 ```javascript
@@ -87,6 +89,7 @@ const { count, checked } = useObservableStates(["count", "checked"]);
 Desc: get a computed state, based on all inner state defined inside NRS, when defined state change, the computation will automatically invoked
 
 Params: computation function which takes all defined states as an argument and return a computed value
+
 Return: a computed value identical with the input computation function
 
 ```javascript
@@ -149,7 +152,9 @@ Desc: a deferred computation result that reflect to React state, the computation
 
 Params: 
 1, computation function, that take all defined state as a argument, and return a Promise or Observable that resolve a computed result.
+
 2: fallback, optional, a replacement value used when async process failed.
+
 3: comparator, optional, a comparator function that determine whether NRS inner state changed
 
 Return:
@@ -183,6 +188,7 @@ const { state, value, error } = useObservableAsyncComputation(({ count, checked 
 Desc: a global state control, which return a Promise or Observable resolve a reduced value, for complex async state handling
 
 params: a reducer function returning a Promise or an Observable that resolve a reduced value
+
 Return: an constant array
 ```javascript
 [
@@ -215,7 +221,9 @@ import { immutableStateObserverManager } from "rx-store-react";
 
 **Usage**
 Useful when you frequently compare and clone complex data structure
-Use of IRS API is the almost the same as NRS
+
+Use of IRS API is the almost the same as use of NRS
+
 Make sure you are familiar with [Immutable data structure](https://immutable-js.com/docs/v4.3.0)
 ```javascript
 import { Map } from "immutable";
