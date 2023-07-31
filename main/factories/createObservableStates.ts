@@ -1,14 +1,22 @@
-import Immutable from "immutable";
+import { Record } from "immutable";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { BS, IBS, RxImStore, RxNStore, Subscribable } from "rx-store-types";
+import {
+  BS,
+  IBS,
+  RxImStore,
+  RxNStore,
+  Subscribable,
+  ConstraintKeys,
+} from "rx-store-types";
 
 export const createObservableNormalStates = <S extends BS>(
   store: RxNStore<S> & Subscribable<S>
 ) => {
   const { observeMultiple, getDefaults } = store;
-  return <T extends (keyof S)[]>(keys: T) => {
-    const [state, set] = useState(getDefaults(keys));
-    useEffect(() => observeMultiple(keys, set), []);
+  return <T extends keyof S>(keys: ConstraintKeys<T>) => {
+    const keysRef = useRef(keys);
+    const [state, set] = useState(getDefaults(keysRef.current));
+    useEffect(() => observeMultiple(keysRef.current, set), []);
     return state;
   };
 };
@@ -18,33 +26,20 @@ export const createObservableImmutableStates = <S extends IBS>(
 ) => {
   const { observeMultiple, getDefaults } = store;
 
-  type Converted<T extends (keyof S)[]> = {
-    [K in keyof Pick<S, T[number]>]: ReturnType<S[K]>;
-  };
-
-  const recordFactory = <T extends (keyof S)[]>(keys: T) => {
-    return Immutable.Record<Converted<T>>(
-      getDefaults(keys).toObject() as Converted<T>
+  const recordFactory = <T extends keyof S>(keys: ConstraintKeys<T>) => {
+    return Record(
+      getDefaults(keys).toObject()
     );
   };
 
-  return <T extends (keyof S)[]>(keys: T) => {
+  return <T extends keyof S>(keys: ConstraintKeys<T>) => {
     const keysRef = useRef(keys);
-    const previousRef = useRef<
-      Immutable.Record<Converted<T>> & Readonly<Converted<T>>
-    >();
     const factory = useCallback(recordFactory(keysRef.current), []);
     const [state, set] = useState(factory());
     useEffect(
       () =>
-        observeMultiple<T[number]>(keys, (data) => {
-          const converted = factory(data);
-          const previous = previousRef.current;
-          if (previous && previous.equals(converted)) {
-            return;
-          }
-          set(converted);
-          previousRef.current = converted;
+        observeMultiple(keysRef.current, (data) => {
+          set(factory(data));
         }),
       []
     );
