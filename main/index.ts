@@ -1,4 +1,6 @@
-import { BS, IBS, RxImStore, RxNStore, Subscribable } from "rx-store-types";
+import { BS, IBS } from "rx-store-types";
+import { RxNStoreImpl } from "rx-store-core/dist/main/normal";
+import { RxImStoreImpl } from "rx-store-core/dist/main/immutable";
 import {
   createObservableImmutableState,
   createObservableNormalState,
@@ -25,7 +27,7 @@ import {
 } from "./factories/createObservableAsyncReducer";
 
 const stateObserverManager = <S extends BS>(
-  store: RxNStore<S> & Subscribable<S>
+  store: RxNStoreImpl<S>
 ) => ({
   useObservableState: createObservableNormalState(store),
   useObservableStates: createObservableNormalStates(store),
@@ -36,7 +38,7 @@ const stateObserverManager = <S extends BS>(
 });
 
 const immutableStateObserverManager = <S extends IBS>(
-  store: RxImStore<S> & Subscribable<S>
+  store: RxImStoreImpl<S>
 ) => ({
   useImmutableObservableState: createObservableImmutableState(store),
   useImmutableObservableStates: createObservableImmutableStates(store),
